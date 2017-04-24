@@ -11,7 +11,7 @@ var configuration = require('./config.js');
 // cli
 program
 	.option('-i, --import <importFileLocation>', 'Imports an excel file and generates .json translation files')
-	.option('--single-files', 'When importing, should all translations for a given language go in one file or be split up based on their page')
+	.option('--single-files [singleFilesName]', 'When importing, should all translations for a given language go in one file or be split up based on their page')
 	.option('-o, --output <destinationFolder>', 'The output location to write the file(s) to')
 	.parse(process.argv);
 
@@ -32,6 +32,9 @@ var paths = {
 	translationsDir : program.output || optionalConfigFile.destinationFolder,//'translations/',
 	translationTemplate: __dirname+'/translation-template.json'
 };
+
+var importAsSingleFile = program.singleFiles || optionalConfigFile.importFromExcelAsSingleFiles || false;
+var singleFilesName = program.singleFilesName || optionalConfigFile.singleFilesName || 'imported-translation.json';
 
 function readXLSX(callback){
 	var workbook = new Excel.Workbook();
@@ -104,21 +107,31 @@ function getLanguagesForWorksheet(worksheet, startingLanguageColumn) {
 readXLSX(function(translation){
 	if(translation){
 		for(var lang in translation){
+			if (importAsSingleFile){
+				var filename = lang + '/' + singleFilesName;
+				writeJSONToFile(filename, translation[lang]);
+				continue;
+			}
+
 			for (var page in translation[lang]) {
 				var thisSection = {};
 				thisSection[page] = translation[lang][page];
-				var filename = lang +'/' + page + '.json';
-				gulp.src(paths.translationTemplate)
-					.pipe(replace(/\/\*js-inject:translations\*\//g, JSON.stringify(thisSection, null, 4)))
-					.pipe(rename(filename))
-					.pipe(gulp.dest(paths.translationsDir));
-				gutil.log(gutil.colors.green('Success') + ' - Translations imported ' + gutil.colors.magenta(paths.translationsDir+filename));
+				var filename = lang + '/' + page + '.json';
+				writeJSONToFile(filename, thisSection);
 			}
 		}
 	}else{
 		gutil.log(gutil.colors.red('Translation tables not created'));
 	}
 });
+
+function writeJSONToFile(filename, jsonData) {
+	gulp.src(paths.translationTemplate)
+		.pipe(replace(/\/\*js-inject:translations\*\//g, JSON.stringify(jsonData, null, 4)))
+		.pipe(rename(filename))
+		.pipe(gulp.dest(paths.translationsDir));
+	gutil.log(gutil.colors.green('Success') + ' - Translations imported ' + gutil.colors.magenta(paths.translationsDir+filename));
+}
 
 module.exports = {
 	readXLSX : readXLSX
