@@ -14,8 +14,8 @@ var config = configuration.config;
 
 // cli
 program
-	.option('-o, --exportFile <exportFile>', 'The file name to export the excel file to')
-	.option('-i, --messages <messages>', 'The directory where the json files are located')
+	.option('-o, --exportFile <excelExportFile>', 'The file name to export the excel file to')
+	.option('-i, --messages <messagesFolder>', 'The directory where the json files are located')
 	.parse(process.argv);
 
 // if a file has been specified use it here
@@ -30,8 +30,8 @@ if (!optionalConfigFile && (!program.exportFile || !program.messages)) {
 }
 
 var paths = {
-	excelExport: program.exportFile || optionalConfigFile.exportFile, //'mercury-translations.xlsx',
-	messagesDir: './' + (program.messages || optionalConfigFile.messages) ,//'./Client/messages/'
+	excelExport: program.excelExportFile || optionalConfigFile.excelExportFile, //'mercury-translations.xlsx',
+	messagesDir: './' + (program.messagesFolder || optionalConfigFile.messagesFolder) ,//'./Client/messages/'
 };
 
 function writeXLSX(callback){

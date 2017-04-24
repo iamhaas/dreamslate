@@ -10,9 +10,9 @@ var configuration = require('./config.js');
 
 // cli
 program
-	.option('-i, --import <importFile>', 'Imports an excel file and generates .json translation files')
+	.option('-i, --import <importFileLocation>', 'Imports an excel file and generates .json translation files')
 	.option('--single-files', 'When importing, should all translations for a given language go in one file or be split up based on their page')
-	.option('-o, --output <destination>', 'The output location to write the file(s) to')
+	.option('-o, --output <destinationFolder>', 'The output location to write the file(s) to')
 	.parse(process.argv);
 
 
@@ -28,8 +28,8 @@ if (!optionalConfigFile && (!program.import || !program.output)) {
 }
 
 var paths = {
-	excelImport: program.import || optionalConfigFile.excelImport,//'mercury-translations.xlsx',
-	translationsDir : program.output || optionalConfigFile.translationsDir,//'translations/',
+	excelImport: program.import || optionalConfigFile.importFileLocation,//'mercury-translations.xlsx',
+	translationsDir : program.output || optionalConfigFile.destinationFolder,//'translations/',
 	translationTemplate: 'translation-template.json'
 };
 
