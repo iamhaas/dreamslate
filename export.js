@@ -25,7 +25,7 @@ try {
 }catch(e) {}
 
 if (!optionalConfigFile && (!program.exportFile || !program.messages)) {
-	console.log('missing required arguments ... run --help');
+	gutil.log(gutil.colors.bgRed('missing required arguments ... run --help'));
 	return;
 }
 
@@ -63,10 +63,11 @@ function writeXLSX(callback){
 			var translationFileKey = translationFile.split(".")[0]; // HOME_PAGE
 
 			var filepath = thisTranslationDirectory + translationFile;
-			translations[language][translationFileKey] = jsonfile.readFileSync(filepath, null);
+			translations[language] = jsonfile.readFileSync(filepath, null);
 
+			var pageNames = Object.keys(translations[language]);
 			// add the name of this key to the worksheets
-			worksheets = _.union(worksheets, [translationFileKey]);
+			worksheets = _.union(worksheets, pageNames);
 		}
 
 		columns.push({

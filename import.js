@@ -23,14 +23,14 @@ try {
 }catch(e) {}
 
 if (!optionalConfigFile && (!program.import || !program.output)) {
-	console.log('missing required arguments ... run --help');
+	gutil.log(gutil.colors.bgRed('missing required arguments ... run --help'));
 	return;
 }
 
 var paths = {
 	excelImport: program.import || optionalConfigFile.importFileLocation,//'mercury-translations.xlsx',
 	translationsDir : program.output || optionalConfigFile.destinationFolder,//'translations/',
-	translationTemplate: 'translation-template.json'
+	translationTemplate: __dirname+'/translation-template.json'
 };
 
 function readXLSX(callback){
@@ -110,7 +110,7 @@ readXLSX(function(translation){
 					.pipe(replace(/\/\*js-inject:translations\*\//g, JSON.stringify(translation[lang][section], null, 4)))
 					.pipe(rename(filename))
 					.pipe(gulp.dest(paths.translationsDir));
-				gutil.log(gutil.colors.green('Success') + ' - Translations imported ' + gutil.colors.magenta('~'+paths.translationsDir+filename));
+				gutil.log(gutil.colors.green('Success') + ' - Translations imported ' + gutil.colors.magenta(paths.translationsDir+filename));
 			}
 		}
 	}else{
