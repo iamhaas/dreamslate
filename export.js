@@ -38,6 +38,7 @@ function writeXLSX(callback){
 
 	// instead of hardcoding the languages we can infer them from the folder names in the messages folder
 	var languages = fs.readdirSync(paths.messagesDir);
+
 	// filter out any hidden folders like .DS_STORE
 	languages = _.filter(languages, function(key) {return key.charAt(0) !== '.'});
 
@@ -56,7 +57,10 @@ function writeXLSX(callback){
 
 		// reading all the names in language directory
 		var thisTranslationDirectory = paths.messagesDir + language + '/';
+
 		var translationFiles = fs.readdirSync(thisTranslationDirectory);
+		// filter out any hidden files names like .DS_STORE
+		translationFiles = _.filter(translationFiles, function(key) {return key.charAt(0) !== '.'});
 
 		for(var fileIndex = 0 ; fileIndex < translationFiles.length; fileIndex++){
 			var translationFile = translationFiles[fileIndex]; // HOME_PAGE.json
@@ -85,6 +89,14 @@ function writeXLSX(callback){
 	function addRow(worksheet, page, section, key){
 		var row = {page: page, section: section, key: key};
 		var item = translations[page][section][key];
+
+		// alter the row data if this is a less nested item
+		if (typeof item === "string"){
+			item = translations[page][section];
+			row.section = "";
+			row.key = section;
+		}
+
 		for (var language in item) {
 			row[language] = item[language];
 		}
@@ -120,6 +132,13 @@ function writeXLSX(callback){
 			var worksheet = workbook.getWorksheet(page);
 			for (var section in translations[language][page]) {
 				tmp[page][section] = tmp[page][section] || {};
+
+				// this is in the event that the .json is two levels deep (i.e. there is no real section)
+				if (typeof translations[language][page][section] === "string"){
+					tmp[page][section][language] = translations[language][page][section];
+					continue;
+				}
+
 				for (var key in translations[language][page][section]){
 					tmp[page][section][key] = tmp[page][section][key] || {};
 					tmp[page][section][key][language] = translations[language][page][section][key];

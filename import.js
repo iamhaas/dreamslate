@@ -104,10 +104,12 @@ function getLanguagesForWorksheet(worksheet, startingLanguageColumn) {
 readXLSX(function(translation){
 	if(translation){
 		for(var lang in translation){
-			for (var section in translation[lang]) {
-				var filename = lang +'/' + section + '.json';
+			for (var page in translation[lang]) {
+				var thisSection = {};
+				thisSection[page] = translation[lang][page];
+				var filename = lang +'/' + page + '.json';
 				gulp.src(paths.translationTemplate)
-					.pipe(replace(/\/\*js-inject:translations\*\//g, JSON.stringify(translation[lang][section], null, 4)))
+					.pipe(replace(/\/\*js-inject:translations\*\//g, JSON.stringify(thisSection, null, 4)))
 					.pipe(rename(filename))
 					.pipe(gulp.dest(paths.translationsDir));
 				gutil.log(gutil.colors.green('Success') + ' - Translations imported ' + gutil.colors.magenta(paths.translationsDir+filename));
