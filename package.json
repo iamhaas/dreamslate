@@ -1,0 +1,26 @@
+{
+  "name": "translate-snippet",
+  "version": "0.0.1",
+  "description": "A command line tool for snippet testing",
+  "main": "index.js",
+  "bin": {
+    "dsimport": "./cli/import.js",
+    "dsexport": "./cli/export.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.9.0",
+    "exceljs": "^0.4.3",
+    "fs": "0.0.1-security",
+    "gulp": "^3.9.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-util": "^3.0.8",
+    "jsonfile": "^2.4.0",
+    "underscore": "^1.8.3"
+  }
+}
