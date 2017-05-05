@@ -16,6 +16,7 @@ var config = configuration.config;
 program
 	.option('-o, --exportFile <excelExportFile>', 'The file name to export the excel file to')
 	.option('-i, --messages <messagesFolder>', 'The directory where the json files are located')
+	.option('-n, --messages <numberOfLanguages>', 'The number of languages you want to translate')
 	.parse(process.argv);
 
 // if a file has been specified use it here
@@ -41,6 +42,8 @@ function writeXLSX(callback){
 
 	// filter out any hidden folders like .DS_STORE
 	languages = _.filter(languages, function(key) {return key.charAt(0) !== '.'});
+	
+	var numOfLangs = (program.numberOfLanguages || optionalConfigFile.numberOfLanguages) || languages.length || 2;
 
 	// add a new excel workbook that will eventually be exported
 	var workbook = new Excel.Workbook();
@@ -85,6 +88,8 @@ function writeXLSX(callback){
 	for (var i in worksheets) {
 		workbook.addWorksheet(worksheets[i]);
 	}
+	
+	var duplicatedKeys = [];
 
 	function addRow(worksheet, page, section, key){
 		var row = {page: page, section: section, key: key};
@@ -154,7 +159,12 @@ function writeXLSX(callback){
 		var worksheet = workbook.getWorksheet(page);
 		for (var section in translations[page]) {
 			for (var key in translations[page][section]){
-				addRow(worksheet, page, section, key);
+				if (duplicatedKeys.indexOf(section) === -1) {
+					addRow(worksheet, page, section, key);
+					if (typeof translations[page][section][key] === "string") {
+						duplicatedKeys.push(section);
+					}	
+				}
 			}
 		}
 	}
@@ -162,7 +172,7 @@ function writeXLSX(callback){
 	// color rows that have missing information
 	workbook.eachSheet(function(worksheet, sheetId) {
 		worksheet.eachRow(function(row, rowNumber) {
-			for (var i = 1; i <= columns.length; i++){
+			for (var i = columns.length - numOfLangs; i <= columns.length; i++){
 				if (!row.values[i]){
 					worksheet.getRow(rowNumber).fill = styles.emptyRow.fill;
 					break;
