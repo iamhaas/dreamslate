@@ -35,8 +35,6 @@ var paths = {
 	messagesDir: './' + (program.messagesFolder || optionalConfigFile.messagesFolder) ,//'./Client/messages/'
 };
 
-var numOfLangs = (program.numberOfLanguages || optionalConfigFile.numberOfLanguages) || 2;
-
 function writeXLSX(callback){
 
 	// instead of hardcoding the languages we can infer them from the folder names in the messages folder
@@ -44,6 +42,8 @@ function writeXLSX(callback){
 
 	// filter out any hidden folders like .DS_STORE
 	languages = _.filter(languages, function(key) {return key.charAt(0) !== '.'});
+	
+	var numOfLangs = (program.numberOfLanguages || optionalConfigFile.numberOfLanguages) || languages.length || 2;
 
 	// add a new excel workbook that will eventually be exported
 	var workbook = new Excel.Workbook();
