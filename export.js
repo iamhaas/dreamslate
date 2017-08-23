@@ -167,13 +167,14 @@ function writeXLSX(callback){
 				}
 			}
 		}
+		duplicatedKeys = [];
 	}
 
 	// color rows that have missing information
 	workbook.eachSheet(function(worksheet, sheetId) {
 		worksheet.eachRow(function(row, rowNumber) {
 			for (var i = columns.length - numOfLangs; i <= columns.length; i++){
-				if (!row.values[i]){
+				if (!row.values[i] || row.values[i].includes('*FR*')){
 					worksheet.getRow(rowNumber).fill = styles.emptyRow.fill;
 					break;
 				}
