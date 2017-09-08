@@ -17,6 +17,7 @@ program
 	.option('-o, --exportFile <excelExportFile>', 'The file name to export the excel file to')
 	.option('-i, --messages <messagesFolder>', 'The directory where the json files are located')
 	.option('-n, --messages <numberOfLanguages>', 'The number of languages you want to translate')
+	.option('-p, --messages <prefixToColour>', 'The prefix for the messages that you want mark as green')
 	.parse(process.argv);
 
 // if a file has been specified use it here
@@ -34,6 +35,8 @@ var paths = {
 	excelExport: program.excelExportFile || optionalConfigFile.excelExportFile, //'mercury-translations.xlsx',
 	messagesDir: './' + (program.messagesFolder || optionalConfigFile.messagesFolder) ,//'./Client/messages/'
 };
+
+var colouringPrefix = program.prefixToColour || optionalConfigFile.prefixToColour;
 
 function writeXLSX(callback){
 
@@ -167,13 +170,14 @@ function writeXLSX(callback){
 				}
 			}
 		}
+		duplicatedKeys = [];
 	}
 
 	// color rows that have missing information
 	workbook.eachSheet(function(worksheet, sheetId) {
 		worksheet.eachRow(function(row, rowNumber) {
 			for (var i = columns.length - numOfLangs; i <= columns.length; i++){
-				if (!row.values[i]){
+				if (!row.values[i] || (colouringPrefix && row.values[i].includes(colouringPrefix))){
 					worksheet.getRow(rowNumber).fill = styles.emptyRow.fill;
 					break;
 				}
